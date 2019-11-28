@@ -15,7 +15,7 @@ using System.Text;
 namespace _3342_TermProject_API.Controllers
 {
     [Produces("application/json")]
-    [Route("api/service/PaymentGateway")]
+    [Route("api/service/PaymentProcessor")]
     [ApiController]
     public class MerchantTransactionController : ControllerBase
     {
@@ -23,8 +23,8 @@ namespace _3342_TermProject_API.Controllers
         DBConnect db = new DBConnect();
         SqlCommand dbCommand = new SqlCommand();
         private int length = 10;
-        [HttpPost("CreateVirtualWallet/{AccountHolderInformation}/{MerchantAccountID}/{APIKey}")]
-        public int CreateVirtualWallet(Wallet AccountHolderInformation, string APIKey)
+        [HttpPost("CreateVirtualWallet/{MerchantAccountID}/{APIKey}/{AccountHolderInformation}")]
+        public int CreateVirtualWallet(int MerchantAccountID, string APIKey, Wallet AccountHolderInformation)
         {
             int exists = validate.checkAPIKey(APIKey);
             int virtualWalletID = 0;
@@ -98,9 +98,9 @@ namespace _3342_TermProject_API.Controllers
         }
         // GET: api/MerchantTransaction
         [HttpGet("GetTransactions/{VirtualWalletID}/{MerchantAccountID}/{APIKey}")]
-        public List<Transaction> GetTransactions(int VirtualWalletID,int MerchantAccountID, string APIKey)
+        public DataSet GetTransactions(int VirtualWalletID,int MerchantAccountID, string APIKey)
         {
-            List<Transaction> transactions = new List<Transaction>();
+            DataSet ds;
             int exists = validate.checkAPIKey(APIKey);
             if (exists == 1)
             {
@@ -119,21 +119,13 @@ namespace _3342_TermProject_API.Controllers
                 dbCommand.Parameters.Add(inputVirtualWalletID);
                 dbCommand.Parameters.Add(inputMerchantAccountID);
 
-                DataSet ds = db.GetDataSetUsingCmdObj(dbCommand);
-
-                int count = ds.Tables[0].Rows.Count;
-                for (int i = 0; i < count; i++)
-                {
-                    Transaction transaction = new Transaction();
-                    transaction.WalletID = int.Parse(db.GetField("Wallet_ID", i).ToString());
-                    transaction.Amount = double.Parse(db.GetField("Transaction_Amount", i).ToString());
-                    transaction.Type = db.GetField("Type", i).ToString();
-                    transaction.CardNumber = int.Parse(db.GetField("Card_Number", i).ToString());
-                    transaction.MerchantID = int.Parse(db.GetField("Merchant_ID", i).ToString());
-                    transactions.Add(transaction);
-                }
+                ds = db.GetDataSetUsingCmdObj(dbCommand);
+                return ds;
             }
-            return transactions;
+            else
+            {
+                return ds = null;
+            }
         }
         [HttpPost("ProcessPayment/{VirtualWalletID}/{Amount}/{Type}/{MerchantAccountID}/{APIKey}")]
         public int ProcessPayment(int VirtualWalletIDReciever, int VirtualWalletIDSender, double Amount, int MerchantAccountID, string APIKey)
@@ -287,7 +279,7 @@ namespace _3342_TermProject_API.Controllers
             return balance;
         }
         [HttpPost("CreateMerchant/{Name}/{Email}")]
-        public string createMerchant(string Name, string Email)
+        public string CreateMerchant(string Name, string Email)
         {
             Random random = new Random();
             string characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
