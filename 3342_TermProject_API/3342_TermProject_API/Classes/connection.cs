@@ -11,8 +11,8 @@ namespace _3342_TermProject_API.Classes
 {
     public class DBConnect
     {
-        String SqlConnectString = "server=cis-mssql1.temple.edu;Database=fa19_3342_tug33182;User id=tug33182;Password=eix3Phe9";
-        //String SqlConnectString = "server=127.0.0.1,5555;Database=fa19_3342_tug33182;User id=tug33182;Password=eix3Phe9";
+        String SqlConnectString = "server=cis-mssql1.temple.edu;Database=fa19_3342_tug45415;User id=tug45415;Password=Eithoo9B";
+        //String SqlConnectString = "server=127.0.0.1,5555;Database=fa19_3342_tug45415;User id=tug45415;Password=Eithoo9B";
         SqlConnection myConnectionSql;
         SqlCommand objCmd;
         SqlDataReader objDataReader;
