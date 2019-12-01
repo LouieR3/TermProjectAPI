@@ -82,8 +82,8 @@ namespace _3342_TermProject_API.Controllers
             return virtualWalletID ;
         }
         // GET: api/MerchantTransaction
-        [HttpGet("GetTransactions/{VirtualWalletID}/{MerchantAccountID}/{APIKey}")]
-        public DataSet GetTransactions(int VirtualWalletID,int MerchantAccountID, string APIKey)
+        [HttpGet("GetTransactions/{Email}/{MerchantAccountID}/{APIKey}")] //Working
+        public DataSet GetTransactions(string Email,int MerchantAccountID, string APIKey)
         {
             DataSet ds;
             int exists = validate.checkAPIKey(APIKey);
@@ -93,12 +93,12 @@ namespace _3342_TermProject_API.Controllers
                 dbCommand.CommandType = CommandType.StoredProcedure;
                 dbCommand.CommandText = "TP_GetTransactions";
 
-                SqlParameter inputVirtualWalletID = new SqlParameter("@WalletID", VirtualWalletID);
+                SqlParameter inputVirtualWalletID = new SqlParameter("@Email", Email);
                 SqlParameter inputMerchantAccountID = new SqlParameter("@MerchantAccountID", MerchantAccountID);
 
                 inputVirtualWalletID.Direction = ParameterDirection.Input;
                 inputVirtualWalletID.SqlDbType = SqlDbType.VarChar;
-                inputMerchantAccountID.Direction = ParameterDirection.Output;
+                inputMerchantAccountID.Direction = ParameterDirection.Input;
                 inputMerchantAccountID.SqlDbType = SqlDbType.Int;
 
                 dbCommand.Parameters.Add(inputVirtualWalletID);
@@ -112,9 +112,10 @@ namespace _3342_TermProject_API.Controllers
                 return ds = null;
             }
         }
-        [HttpPost("ProcessPayment/{VirtualWalletID}/{Amount}/{Type}/{MerchantAccountID}/{APIKey}")]
-        public int ProcessPayment(int VirtualWalletIDReciever, int VirtualWalletIDSender, double Amount, int MerchantAccountID, string APIKey)
+        [HttpPost("ProcessPayment/{EmailReciever}/{EmailSender}/{Amount}/{CardNumber}/{Type}/{MerchantAccountID}/{APIKey}")] //Working
+        public Boolean ProcessPayment(string EmailReciever, string EmailSender, double Amount, int CardNumber, string Type, int MerchantAccountID, string APIKey)
         {
+            Boolean success = false;
             int exists = validate.checkAPIKey(APIKey);
             int count = 0;
             if (exists == 1)
@@ -123,28 +124,40 @@ namespace _3342_TermProject_API.Controllers
                 dbCommand.CommandType = CommandType.StoredProcedure;
                 dbCommand.CommandText = "TP_ProcessPayment";
 
-                SqlParameter inputVirtualWalletIDReciever = new SqlParameter("@VirtualWalletIDReciever", VirtualWalletIDReciever);
-                SqlParameter inputVirtualWalletIDSender = new SqlParameter("@VirtualWalletIDSender", VirtualWalletIDSender);
-                SqlParameter inputMerchantAccountID = new SqlParameter("@VirtualWalletIDSender", VirtualWalletIDSender);
+                SqlParameter inputEmailReciever = new SqlParameter("@EmailReciever", EmailReciever);
+                SqlParameter inputEmailSender = new SqlParameter("@EmailSender", EmailSender);
+                SqlParameter inputMerchantAccountID = new SqlParameter("@MerchantAccountID", MerchantAccountID);
+                SqlParameter inputType = new SqlParameter("@Type", Type);
+                SqlParameter inputCardNumber = new SqlParameter("@CardNumber", CardNumber);
                 SqlParameter inputAmount = new SqlParameter("@Amount", Amount);
 
-                inputVirtualWalletIDReciever.Direction = ParameterDirection.Input;
-                inputVirtualWalletIDReciever.SqlDbType = SqlDbType.VarChar;
-                inputVirtualWalletIDSender.Direction = ParameterDirection.Input;
-                inputVirtualWalletIDSender.SqlDbType = SqlDbType.Int;
+                inputEmailReciever.Direction = ParameterDirection.Input;
+                inputEmailReciever.SqlDbType = SqlDbType.VarChar;
+                inputEmailSender.Direction = ParameterDirection.Input;
+                inputEmailSender.SqlDbType = SqlDbType.VarChar;
                 inputMerchantAccountID.Direction = ParameterDirection.Input;
                 inputMerchantAccountID.SqlDbType = SqlDbType.Int;
+                inputType.Direction = ParameterDirection.Input;
+                inputType.SqlDbType = SqlDbType.VarChar;
+                inputCardNumber.Direction = ParameterDirection.Input;
+                inputCardNumber.SqlDbType = SqlDbType.Int;
                 inputAmount.Direction = ParameterDirection.Input;
-                inputAmount.SqlDbType = SqlDbType.Int;
+                inputAmount.SqlDbType = SqlDbType.Float;
 
-                dbCommand.Parameters.Add(inputVirtualWalletIDReciever);
-                dbCommand.Parameters.Add(inputVirtualWalletIDSender);
+                dbCommand.Parameters.Add(inputEmailReciever);
+                dbCommand.Parameters.Add(inputEmailSender);
                 dbCommand.Parameters.Add(inputMerchantAccountID);
                 dbCommand.Parameters.Add(inputAmount);
+                dbCommand.Parameters.Add(inputType);
+                dbCommand.Parameters.Add(inputCardNumber);
 
                 count = db.DoUpdateUsingCmdObj(dbCommand);
+                if(count == 3)
+                {
+                    success = true;
+                }
             }
-            return count;
+            return success;
         }
         [HttpPut("UpdatePaymentAccount/{APIKey}")]//Working
         public Boolean UpdatePaymentAccount(string APIKey,[FromBody] Wallet AccountHolderInformation)
@@ -240,7 +253,7 @@ namespace _3342_TermProject_API.Controllers
             }
             return success;
         } 
-        [HttpGet("GetBalance/{Email}/{MerchantAccountID}/{APIKey}")]
+        [HttpGet("GetBalance/{Email}/{MerchantAccountID}/{APIKey}")] //Working
 	    public double GetBalance(string Email, int MerchantAccountID, string APIKey)
         {
             double balance = 0.0;
