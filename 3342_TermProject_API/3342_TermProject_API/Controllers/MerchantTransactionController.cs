@@ -1,4 +1,6 @@
-﻿using System;
+﻿//Gavin Rodgers and Louie Rodriguez
+//Web API For Payment Processing
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,7 +25,8 @@ namespace _3342_TermProject_API.Controllers
         DBConnect db = new DBConnect();
         SqlCommand dbCommand = new SqlCommand();
         private int length = 10;
-        [HttpPost("CreateVirtualWallet/{APIKey}")] //Working
+        //Creates the user virtual wallet
+        [HttpPost("CreateVirtualWallet/{APIKey}")] //Working 
         public Boolean CreateVirtualWallet(string APIKey, [FromBody] Wallet AccountHolderInformation)
         {
             int exists = validate.checkAPIKey(APIKey);
@@ -124,6 +127,7 @@ namespace _3342_TermProject_API.Controllers
                 return transactions = null;
             }
         }
+        //Gets user account information from wallet
         [HttpGet ("GetAccountInformation/{Email}/{MerchantAccountID}/{APIKey}")]//working
         public Wallet GetAccountInformation(string Email, int MerchantAccountID, string APIKey)
         {
@@ -161,6 +165,7 @@ namespace _3342_TermProject_API.Controllers
                 return wallet = null;
             }
         }
+        //Processes payment
         [HttpPost("ProcessPayment/{MerchantAccountID}/{APIKey}")] //Working
         public Boolean ProcessPayment(int MerchantAccountID, string APIKey, [FromBody] Payment paymentInfo)
         {
@@ -208,6 +213,7 @@ namespace _3342_TermProject_API.Controllers
             }
             return success;
         }
+        //Updates the payment account of the user
         [HttpPut("UpdatePaymentAccount/{APIKey}")]//Working
         public Boolean UpdatePaymentAccount(string APIKey, [FromBody] Wallet AccountHolderInformation)
         {
@@ -267,6 +273,7 @@ namespace _3342_TermProject_API.Controllers
             }
             return success;
         }
+        //Adds funds to the account of the user
         [HttpPut("FundAccount/{MerchantAccountID}/{APIKey}")] //Working
         public Boolean FundAccount(int MerchantAccountID, string APIKey, [FromBody] Fund fund)
         {
@@ -302,6 +309,7 @@ namespace _3342_TermProject_API.Controllers
             }
             return success;
         }
+        //Gets the wallet balance for the user
         [HttpGet("GetBalance/{Email}/{MerchantAccountID}/{APIKey}")] //Working
         public double GetBalance(string Email, int MerchantAccountID, string APIKey)
         {
@@ -333,8 +341,9 @@ namespace _3342_TermProject_API.Controllers
             }
             return balance;
         }
-        [HttpPost("CreateMerchant/{Name}/{Email}")] //Working
-        public string CreateMerchant(string Name, string Email)
+        //Creates Merchant account
+        [HttpPost("CreateMerchant/")] //Working
+        public string CreateMerchant([FromBody] Merchant merch)
         {
             Random random = new Random();
             string characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -349,8 +358,8 @@ namespace _3342_TermProject_API.Controllers
                 dbCommand.CommandType = CommandType.StoredProcedure;
                 dbCommand.CommandText = "TP_CreateMerchant";
 
-                SqlParameter inputMerchantName = new SqlParameter("@Name", Name);
-                SqlParameter inputMerchantEmail = new SqlParameter("@Email", Email);
+                SqlParameter inputMerchantName = new SqlParameter("@Name", merch.Name);
+                SqlParameter inputMerchantEmail = new SqlParameter("@Email", merch.Email);
                 SqlParameter inputAPIKey = new SqlParameter("@APIKey", apiKey);
 
                 inputMerchantName.Direction = ParameterDirection.Input;
