@@ -13,7 +13,7 @@ namespace _3342_TermProject_API.Classes
         string bankName;
         string cardType;
         int cardNumber;
-        string merchantAccountID;
+        int merchantAccountID;
         public Wallet()
         {
         }
@@ -47,7 +47,7 @@ namespace _3342_TermProject_API.Classes
             get { return cardNumber; }
             set { cardNumber = value; }
         }
-        public string MerchantAccountID
+        public int MerchantAccountID
         {
             get { return merchantAccountID; }
             set { merchantAccountID = value; }

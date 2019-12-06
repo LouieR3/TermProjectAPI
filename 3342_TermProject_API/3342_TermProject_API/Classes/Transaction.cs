@@ -7,20 +7,26 @@ namespace _3342_TermProject_API.Classes
 {
     public class Transaction
     {
-        private int walletID = 0; 
+        private int transID = 0; 
         private double amount = 0.0;
         private string type = "";
         private int cardNumber = 0;
         private int merchantID = 0;
+        private string email = "";
 
         public Transaction()
         {
 
         }
-        public int WalletID
+        public int TransactionID
         {
-            get { return walletID; }
-            set { walletID = value; }
+            get { return transID; }
+            set { transID = value; }
+        }
+        public string Email
+        {
+            get { return email; }
+            set { email = value; }
         }
         public double Amount
         {
